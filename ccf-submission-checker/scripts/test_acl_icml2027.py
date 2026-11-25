@@ -69,7 +69,7 @@ class PreflightTests(unittest.TestCase):
             self.assertEqual(status[key], "pass")
 
     def test_icml_old_style_and_comment_only_disclosure(self):
-        self.write("{icml2026}", r"""
+        self.write("{amsmath,icml2026}", r"""
 % \section*{AI Use Statement} Comment only.
 \bibliography{refs}
 \section*{Impact Statement} Too late.
@@ -78,6 +78,32 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(status["template_mode"], "fail")
         self.assertEqual(status["impact_statement"], "fail")
         self.assertEqual(status["ai_disclosure"], "not_verified")
+
+    def test_icml_rejects_loading_both_years(self):
+        self.write("{icml2027,icml2026}", r"\section{Introduction} Main text.")
+        self.assertEqual(self.statuses("icml", "research")["template_mode"], "fail")
+
+    def test_acl_limitations_follow_main_text_and_require_content(self):
+        self.write("[review]{acl}", r"""
+\section*{Limitations} Limited scope.
+\section{Conclusion} Final main-text section.
+\bibliography{refs}
+""")
+        self.assertEqual(self.statuses("acl", "long")["limitations"], "fail")
+        self.write("[review]{acl}", r"\section*{Limitations}\label{sec:limits}\bibliography{refs}")
+        self.assertEqual(self.statuses("acl", "long")["limitations"], "fail")
+
+    def test_icml_flags_impact_and_disclosure_inside_main_text(self):
+        self.write("{icml2027}", r"""
+\section{Method} Main text.
+\section*{Impact Statement} Limited effects.
+\section*{AI Use Statement} Routine editing.
+\section{Conclusion} More main text.
+\bibliography{refs}
+""")
+        status = self.statuses("icml", "research")
+        self.assertEqual(status["impact_statement"], "fail")
+        self.assertEqual(status["ai_disclosure"], "fail")
 
     def test_conditional_source_needs_rendered_inspection(self):
         self.write("[review]{acl}", r"\iftrue\section*{Limitations} Limited scope.\fi")
@@ -109,6 +135,19 @@ class PreflightTests(unittest.TestCase):
             self.assertEqual(self.statuses("icml", "research", pdf=self.pdf, main_pages=9)["main_pages"], "fail")
             self.assertEqual(self.statuses("icml", "research", "camera-ready", pdf=self.pdf,
                                            main_pages=11)["main_pages"], "fail")
+
+    def test_later_page_geometry_and_author_metadata_checked(self):
+        self.write("[review]{acl}", r"\section*{Limitations} Limited scope.\bibliography{refs}")
+        info = (b"Pages: 2\nPage    1 size: 595.276 x 841.89 pts (A4)\n"
+                b"Page    2 size: 612 x 792 pts (letter)\nAuthor: Example Author\n")
+        with patch.object(checker.shutil, "which", return_value="pdfinfo"), \
+             patch.object(checker.subprocess, "run") as run:
+            run.return_value.stdout = info
+            status = self.statuses("acl", "long", pdf=self.pdf)
+            self.assertEqual(status["first_page_size"], "pass")
+            self.assertEqual(status["page_geometry"], "fail")
+            self.assertEqual(status["pdf_author_metadata"], "fail")
+            self.assertEqual(status["arr_submission"], "not_verified")
 
 
 if __name__ == "__main__":

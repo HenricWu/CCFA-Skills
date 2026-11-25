@@ -21,6 +21,13 @@ PACKAGE = re.compile(r"\\usepackage\s*(?:\[([^]]*)\])?\s*\{([^}]+)\}")
 SECTION = re.compile(r"\\section\*?\s*(?:\[[^]]*\])?\s*\{\s*([^{}]+?)\s*\}")
 REFERENCES = re.compile(r"\\(?:bibliography\s*\{|printbibliography\b|begin\s*\{thebibliography\})")
 APPENDIX = re.compile(r"\\appendix\b")
+SECTION_TITLES = {
+    "acl": {"limitations": {"limitations"}},
+    "icml": {
+        "impact_statement": {"impact statement"},
+        "ai_disclosure": {"ai disclosure statement", "ai use statement"},
+    },
+}
 
 
 def check_source(tex, project, venue, stage, add):
@@ -38,17 +45,23 @@ def check_source(tex, project, venue, stage, add):
 
     body_parts = re.split(r"\\begin\s*\{document\}", text, maxsplit=1)
     preamble, body = body_parts if len(body_parts) == 2 else (text, "")
-    options = [{option.strip() for option in (match[1] or "").split(",") if option.strip()}
-               for match in PACKAGE.finditer(preamble) if package in map(str.strip, match[2].split(","))]
+    declarations = [(set(map(str.strip, match[2].split(","))),
+                     {option.strip() for option in (match[1] or "").split(",") if option.strip()})
+                    for match in PACKAGE.finditer(preamble)]
+    options = [parsed_options for names, parsed_options in declarations if package in names]
+    other_icml_style = venue == "icml" and any(
+        re.fullmatch(r"icml\d{4}", name) and name != package
+        for names, _ in declarations for name in names
+    )
     expected_modes = ({"review"},) if venue == "acl" else (set(),)
     if stage == "camera-ready":
         expected_modes = (set(), {"final"}) if venue == "acl" else ({"accepted"},)
     allowed_non_modes = {"hyperref", "nohyperref"} if venue == "acl" else {"nohyperref"}
-    if not options and not re.search(r"\\usepackage[^\n]*\{\s*icml\d{4}\s*\}", preamble):
+    if not options and not other_icml_style:
         add("template_mode", "not_verified", f"No direct {package} declaration found. Check active class/package and options.")
     else:
-        mode_ok = len(options) == 1 and (options[0] - allowed_non_modes) in expected_modes
-        add("template_mode", "pass" if mode_ok else "fail", f"Expected {package} options for {stage}")
+        mode_ok = len(options) == 1 and (options[0] - allowed_non_modes) in expected_modes and not other_icml_style
+        add("template_mode", "pass" if mode_ok else "fail", f"Expected one {package} declaration with options for {stage}")
 
     kit = TEMPLATES / venue.upper() / "2027"
     try:
@@ -72,33 +85,45 @@ def check_source(tex, project, venue, stage, add):
         add("required_sections", "not_verified", "Document body not found in standard form. Inspect the compiled paper.")
         return
 
+    check_sections(body, venue, add)
+
+
+def check_sections(body, venue, add):
     references = REFERENCES.search(body)
     appendix = APPENDIX.search(body)
     headings = list(SECTION.finditer(body))
     boundaries = [match.start() for match in [*headings, references, appendix] if match]
 
-    def check_section(key, names, *, before_references):
+    titles = SECTION_TITLES[venue]
+    end_matter = set().union(*titles.values(), {
+        "acknowledgments", "acknowledgements", "ethical considerations", "ethics statement",
+    })
+    tail_offsets = [match.start() for match in (references, appendix) if match]
+    text_end = min(tail_offsets, default=len(body))
+    main_headings = [heading for heading in headings
+                     if heading.start() < text_end and heading[1].casefold() not in end_matter]
+    for key, names in titles.items():
         sections = [heading for heading in headings if heading[1].casefold() in names]
         if not sections:
-            add(key, "not_verified", "No matching literal heading found. Verify its presence in the compiled paper.")
-            return
+            add(key, "not_verified", "Required heading not detected. Inspect the PDF, including macro-defined headings.")
+            continue
         heading = sections[0]
         end = min((offset for offset in boundaries if offset > heading.start()), default=len(body))
         content = body[heading.end():end].split(r"\end{document}", 1)[0].strip()
-        if len(sections) != 1 or not content or re.match(r"^(?:todo|tbd|placeholder)\b", content, re.I):
+        visible = re.sub(r"\\(?:label|index)\s*\{[^{}]*\}", "", content).strip()
+        if len(sections) != 1 or not visible or re.match(r"^(?:\[\s*)?(?:todo|tbd|placeholder)\b", visible, re.I):
             add(key, "fail", "Expected one populated section")
-        elif before_references and references is None:
+        elif main_headings and heading.start() < main_headings[-1].start():
+            add(key, "fail", "Required section appears before the last main-text section")
+        elif key != "ai_disclosure" and references is None:
             add(key, "not_verified", "Heading found. Verify its placement before references in the PDF.")
-        elif before_references and heading.start() > references.start():
+        elif key != "ai_disclosure" and heading.start() > references.start():
             add(key, "fail", "Required section appears after references")
+        elif appendix and heading.start() > appendix.start():
+            add(key, "not_verified", "Section appears inside appendix source. Verify required placement in the PDF.")
         else:
             add(key, "pass", "Matching source section found. Verify rendered placement and content.")
 
-    if venue == "acl":
-        check_section("limitations", {"limitations"}, before_references=True)
-    else:
-        check_section("impact_statement", {"impact statement"}, before_references=True)
-        check_section("ai_disclosure", {"ai disclosure statement", "ai use statement"}, before_references=False)
     if appendix and references:
         proper_order = references.start() < appendix.start()
         add("appendix_order", "pass" if proper_order else "fail", "Appendices follow references")
@@ -116,7 +141,8 @@ def check_pdf(pdf, main_pages, limit, venue, stage, add):
         add("pdf", "not_verified", "pdfinfo unavailable")
         return
     try:
-        result = subprocess.run([pdfinfo, "-enc", "UTF-8", "-isodates", str(pdf.resolve())],
+        result = subprocess.run([pdfinfo, "-enc", "UTF-8", "-isodates", "-f", "1", "-l", "1000000",
+                                 str(pdf.resolve())],
                                 capture_output=True, check=True, timeout=20)
         info = result.stdout.decode("utf-8")
         pages_match = re.search(r"^Pages:[ \t]+(\d+)", info, re.M)
@@ -129,12 +155,24 @@ def check_pdf(pdf, main_pages, limit, venue, stage, add):
     add("pdf", "pass", f"Readable PDF, {pages} total pages")
 
     _, _, dimensions, size_name, _ = GUIDE[venue]
-    size = re.search(r"^Page size:[ \t]+([\d.]+) x ([\d.]+) pts", info, re.M)
-    if size:
-        right_size = all(abs(float(value) - target) < 1 for value, target in zip(size.groups(), dimensions))
-        add("first_page_size", "pass" if right_size else "fail", f"Expected {size_name} on the first page")
+    sizes = {int(number): (float(width), float(height)) for number, width, height in re.findall(
+        r"^Page[ \t]+(\d+)[ \t]+size:[ \t]+([\d.]+) x ([\d.]+) pts", info, re.M
+    )}
+    if not sizes:
+        first_size = re.search(r"^Page size:[ \t]+([\d.]+) x ([\d.]+) pts", info, re.M)
+        if first_size:
+            sizes[1] = (float(first_size[1]), float(first_size[2]))
+    wrong = [page for page, size in sizes.items()
+             if any(abs(value - target) >= 1 for value, target in zip(size, dimensions))]
+    first_page_status = "fail" if 1 in wrong else "pass" if 1 in sizes else "not_verified"
+    add("first_page_size", first_page_status, f"Expected {size_name} on the first page")
+    if wrong:
+        numbers = ", ".join(map(str, wrong[:10]))
+        add("page_geometry", "fail", f"Expected {size_name}. Off-size pages: {numbers} ({len(wrong)} total)")
+    elif len(sizes) == pages:
+        add("page_geometry", "pass", f"All {pages} pages use {size_name}")
     else:
-        add("first_page_size", "not_verified", f"Expected {size_name}. Inspect PDF geometry.")
+        add("page_geometry", "not_verified", f"Measured {len(sizes)} of {pages} pages")
 
     if main_pages is not None:
         valid = 0 < main_pages <= min(pages, limit)
@@ -149,9 +187,9 @@ def check_pdf(pdf, main_pages, limit, venue, stage, add):
         value = author[1].strip().casefold() if author else ""
         accepted = {"", "anonymous", "anonymous authors", "anonymous submission", "anonymous acl submission",
                     "anonymous author(s)"}
-        add("pdf_author_metadata", "pass" if value in accepted else "not_verified",
+        add("pdf_author_metadata", "pass" if value in accepted else "fail",
             "Author metadata is empty or anonymous" if value in accepted else
-            "Author metadata needs inspection for identifying information")
+            "Non-anonymous Author metadata. Inspect it and remove identifying information.")
 
 
 def audit(venue, track, stage, tex, pdf=None, main_pages=None, project_root=None):
@@ -165,7 +203,15 @@ def audit(venue, track, stage, tex, pdf=None, main_pages=None, project_root=None
     limit = (4 if track == "short" else 8) + (stage == "camera-ready")
     check_source(tex, project, venue, stage, add)
     check_pdf(pdf, main_pages, limit, venue, stage, add)
-    add("manual", "not_verified", "Verify policy freshness, active build, section content, full PDF anonymity/format, and OpenReview fields")
+    add("manual", "not_verified", "Verify live rules, build logs, rendered submission, supplements and required section content")
+    if venue == "acl" and stage == "review":
+        add("arr_submission", "not_verified", "Check cycle, Responsible NLP answers, AI assistance, profiles and service registration")
+    elif venue == "acl":
+        add("acl_commitment", "not_verified", "Check the committed ARR version, decision, author list and final instructions")
+    elif stage == "review":
+        add("icml_submission", "not_verified", "Check contribution type, actual AI use, profiles, quotas and reviewer eligibility")
+    else:
+        add("icml_camera_ready", "not_verified", "Check final limits and metadata, registration and lay summary")
     failures = sum(check["status"] == "fail" for check in checks)
     return {"venue": venue.upper(), "year": 2027, "track": track, "stage": stage,
             "policy_records": GUIDE[venue][-1], "policy_checked": "2026-11-25",

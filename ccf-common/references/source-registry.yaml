@@ -115,6 +115,24 @@ sources:
     verified_at: 2026-11-25
     stale_after_days: 30
     notes: "Privacy-compliant tools may clarify concepts, help explore related works or polish an existing review. Official judgment, critique, manuscript summary and first-draft review remain with the human reviewer."
+  - id: acl-arr-ac-guidelines
+    title: ACL Rolling Review Area Chair Guidelines
+    url: https://aclrollingreview.org/acguidelines
+    source_type: review_guideline
+    used_by: [ccf-paper-reviewer]
+    recorded_at: 2026-11-25
+    verified_at: 2026-11-25
+    stale_after_days: 30
+    notes: "Separate ARR meta-review and recommended revisions from the venue commitment decision. Read the active form for recommendation anchors and apply current confidentiality requirements."
+  - id: icml-2027-reviewer-instructions
+    title: ICML 2027 Reviewer Instructions
+    url: https://icml.cc/Conferences/2027/ReviewerInstructions
+    source_type: review_guideline
+    used_by: [ccf-paper-reviewer]
+    recorded_at: 2026-11-25
+    verified_at: 2026-11-25
+    stale_after_days: 30
+    notes: "Verified full-review form criteria, contribution-type guidance, decision-relevant author questions and post-response final justification. Use with the separate ICML AI-review policy."
   - id: cvpr-2027-author-guidelines
     title: CVPR 2027 Author Guidelines
     url: https://cvpr.thecvf.com/Conferences/2027/AuthorGuidelines
@@ -454,7 +472,7 @@ sources:
     source_type: review_guideline
     used_by: [ccf-paper-reviewer]
     recorded_at: 2026-06-05
-    verified_at: 2026-10-30
+    verified_at: 2026-11-25
     stale_after_days: 180
     notes: "Official form inspected: contribution-aware soundness, excitement, overall assessment, confidence, limitations, ethics and revision tracking. It permits half-point anchors; use its actual scale only when this form applies."
   - id: keshav-how-to-read-paper

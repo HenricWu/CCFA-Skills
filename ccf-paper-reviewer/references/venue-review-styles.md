@@ -35,7 +35,15 @@ Review emphasis:
 - Penalize weak statistical practice, missing strong baselines, unclear training/evaluation details, and overstated generalization.
 - Reward clean problem formulation, theory/intuition, and evidence that explains why the method works.
 
-For ICML 2027, verify the selected contribution type and distinguish the official initial AC/SAC screen from an internal mock review. An assigned reviewer must comply with the registered policy icml-2027-review-ai. The reviewer authors their own summary, critique, questions and judgment. AI assistance is limited to permitted clarification, related-work exploration and polishing a human-written review, in a privacy-compliant environment.
+### ICML 2027 Assessment
+
+- Use `icml-2027-reviewer-instructions` and `icml-2027-contribution-types`. In the verified venue form, distinguish soundness, presentation, significance and originality. Use its ordinal anchors only when venue-form simulation is requested. The default CCFA report and its rubric still apply to an ordinary internal review.
+- Assess the primary contribution on its own evidence. For example, evaluate the theorem and assumptions for theory, practical utility and credible evaluation for application-driven work, and the tested conditions and inference from failures for negative results. Keep the decisive concerns and the evidence that could resolve them. Reassess those concerns after the author response.
+- Distinguish the first-stage AC decision confirmed by an SAC, the full reviewer recommendation, and the final decision. For an internal review without first-stage feedback, describe evidence-based risks without predicting a screening result.
+
+### ICML 2027 Official Review Assistance
+
+Apply `icml-2027-review-ai` before handling assigned work. The human reviewer authors their own summary, critique, questions and judgment. Help only with permitted clarification, related-work exploration, or polishing a human-written review in a privacy-compliant environment. Ask for the human-written text before polishing. The author-owned internal review workflow may use CCFA's normal assessment and optional expert reading within the authorized scope.
 
 ## ICLR
 
@@ -64,7 +72,14 @@ Review emphasis:
 - Reproducibility and responsible NLP details matter: data, annotation, human subjects, bias, societal impact, and checklist support.
 - For resubmissions, explicitly show how prior review concerns were addressed.
 
-For ACL 2027, distinguish ARR reviewer/AC assessment from the publication decision at ACL commitment. Use the active ARR review form when simulating venue scoring. An assigned ARR reviewer or AC writes the first draft and substantive reasoning personally and handles manuscripts and reviews only under the confidentiality rules in acl-arr-reviewer-guidelines.
+### ACL 2027 and ARR Assessment
+
+- Use the active `acl-arr-review-form` and `acl-arr-ac-guidelines`. Keep soundness, excitement, overall recommendation and confidence distinct. When explicitly simulating the official form, evaluate soundness and reproducibility for Findings and the additional significance or originality case for a main-conference recommendation. Use the form's actual anchors. ARR reviewer or AC recommendations do not amount to a publication decision at ACL commitment.
+- Evaluate a short paper against the evidence its focused contribution needs. Ground central concerns in the language task, annotation, splits, comparisons or analysis where they matter. Credit candid Limitations and judge the effect of each limitation on the claim. For another ARR cycle, compare the prior issue, the actual change and any residual risk.
+
+### ARR Official Review Assistance
+
+Apply `acl-arr-reviewer-guidelines` and `acl-arr-ac-guidelines` to confidential assignments. The human reviewer or AC writes the first draft and substantive reasoning. Language assistance uses their existing draft and requires a privacy-preserving tool. An author-owned internal pre-review follows the ordinary CCFA workflow.
 
 ## CVPR / ICCV / ECCV
 

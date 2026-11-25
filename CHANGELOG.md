@@ -6,6 +6,8 @@
 - Wire ACL long/short and ICML main research guidance into scaffolding, writing, review, response and submission checks.
 - Add a local checker that reports source, rendered PDF and unresolved manual checks for both venues.
 
+- Match the CVPR template/preflight pattern and the ICLR author-versus-assigned-reviewer split. Check whole-PDF paper geometry, stated section order, and distinct ACL/ARR and ICML review-stage requirements.
+
 ## v0.12.0 - 2026-10-31
 
 Plugin version is `0.12.0`.

@@ -11,7 +11,17 @@
 
 A long paper develops a substantial CL/NLP contribution. A short paper earns its place through a focused finding or contribution, with a self-contained argument and enough evidence to evaluate it. For either length, identify the language problem or insight and the claim each comparison tests. When applicable, state data provenance, languages and domains, split construction and contamination controls, evaluation and annotation protocols, and conditions for comparing scores. Report relevant subgroup or error analysis at the level supported by the data. For an analysis, resource or negative result, justify its significance for CL/NLP on its own terms.
 
-Retain the author's supplied LaTeX and scientific scope. For a new scaffold, copy the official bundle. Use `\usepackage[review]{acl}` for anonymous review, and `\usepackage{acl}` or `\usepackage[final]{acl}` for camera-ready. The shared ACL style uses A4 and `acl_natbib`. Use `\citet` for narrative citations and `\citep` for parenthetical citations. Keep published prior work cited in the third person during review. The `preprint` mode exposes author identities.
+## Template and Build Mode
+
+For a new 2027 scaffold, copy the complete official bundle from the template path above. Retain the supplied LaTeX and scientific scope when revising an existing paper. The shared ACL style uses A4 and `acl_natbib`. Keep published prior work cited in the third person during review.
+
+| Stage | Package declaration | Output |
+| --- | --- | --- |
+| ARR review | `\usepackage[review]{acl}` | Anonymous review PDF with line numbers |
+| ACL camera-ready | `\usepackage{acl}` or `\usepackage[final]{acl}` | Final author-visible paper after acceptance |
+| Preprint | `\usepackage[preprint]{acl}` | Author-visible preprint, subject to the chosen ARR preprint status |
+
+The official examples illustrate formatting. Replace their sample text, acknowledgments and Limitations with the actual manuscript or placeholders explicitly marked as unresolved in a scaffold. Recheck the active cycle and the destination when another venue shares the style.
 
 ## ARR Review and ACL Commitment
 
@@ -37,4 +47,4 @@ From the CCFA root, the local check for an ARR short paper is:
 python ccf-submission-checker/scripts/check_acl_icml2027.py --venue acl --track short --tex path/to/main.tex --pdf path/to/main.pdf
 ```
 
-Use `--track long` for long papers and `--stage camera-ready` for an accepted ACL 2027 paper. Supply `--main-pages` only after inspecting the compiled main-content boundary. Use the full checklist for anonymity, disclosure and OpenReview status. EMNLP, NAACL, and other years require their own policy verification even when they share the style.
+Use `--track long` for long papers and `--stage camera-ready` for an accepted ACL 2027 paper. The preflight inspects the template, Limitations, PDF Author metadata and page sizes. Supply `--main-pages` only after inspecting the compiled main-content boundary. Check visible anonymity, actual AI assistance, the Responsible NLP form, and the ARR/ACL workflow separately. Resolve a heading the tool cannot detect against the rendered PDF.
