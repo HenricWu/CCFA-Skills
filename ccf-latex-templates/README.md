@@ -124,6 +124,10 @@ ccf-latex-templates/
 |-- ACL/ / EMNLP/ / NAACL/ / COLING/ / CoNLL/
 ```
 
+## ACL 2027 and ICML 2027
+
+Copy the entire matching bundle for a new paper. Use [ACL/2027/acl_latex.tex](ACL/2027/acl_latex.tex) for pdfLaTeX or [acl_lualatex.tex](ACL/2027/acl_lualatex.tex) for LuaLaTeX or XeLaTeX. Use [ICML/2027/example_paper.tex](ICML/2027/example_paper.tex) for ICML research. The [ACL manifest](ACL/2027/template-source.json) and [ICML manifest](ICML/2027/template-source.json) record the upstream source and hashes. Apply the [ACL guide](../ccf-paper-writer/references/venue-guides/acl.md) or [ICML guide](../ccf-paper-writer/references/venue-guides/icml.md) when turning an official example into a manuscript.
+
 ## Verified Template Download Sources
 
 | Conference | Source | URL |

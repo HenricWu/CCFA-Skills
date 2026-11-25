@@ -1,5 +1,11 @@
 # Changelog
 
+## ACL 2027 and ICML 2027 venue support · 2026-11-25
+
+- Package the official year-specific LaTeX sources with template provenance. Keep the historical files in their existing paths.
+- Wire ACL long/short and ICML main research guidance into scaffolding, writing, review, response and submission checks.
+- Add a local checker that reports source, rendered PDF and unresolved manual checks for both venues.
+
 ## v0.12.0 - 2026-10-31
 
 Plugin version is `0.12.0`.

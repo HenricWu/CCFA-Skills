@@ -35,6 +35,8 @@ Review emphasis:
 - Penalize weak statistical practice, missing strong baselines, unclear training/evaluation details, and overstated generalization.
 - Reward clean problem formulation, theory/intuition, and evidence that explains why the method works.
 
+For ICML 2027, verify the selected contribution type and distinguish the official initial AC/SAC screen from an internal mock review. An assigned reviewer must comply with the registered policy icml-2027-review-ai. The reviewer authors their own summary, critique, questions and judgment. AI assistance is limited to permitted clarification, related-work exploration and polishing a human-written review, in a privacy-compliant environment.
+
 ## ICLR
 
 Primary dimensions: value to the community, new knowledge, soundness, novelty, significance, clarity, and discussion responsiveness.
@@ -61,6 +63,8 @@ Review emphasis:
 - Excitement is more subjective; improve it through clear usefulness, insight, surprising finding, strong resource, new framing, or broad relevance.
 - Reproducibility and responsible NLP details matter: data, annotation, human subjects, bias, societal impact, and checklist support.
 - For resubmissions, explicitly show how prior review concerns were addressed.
+
+For ACL 2027, distinguish ARR reviewer/AC assessment from the publication decision at ACL commitment. Use the active ARR review form when simulating venue scoring. An assigned ARR reviewer or AC writes the first draft and substantive reasoning personally and handles manuscripts and reviews only under the confidentiality rules in acl-arr-reviewer-guidelines.
 
 ## CVPR / ICCV / ECCV
 

@@ -324,6 +324,10 @@ CCFA-Skills/
 
 绘图先明确读者要理解什么、必要对象和真实关系，再扩展提示词。流程图的新绘／重绘固定为三阶段：提示词、参考图与文章整理P → GPT Image生成G0 → 同P与G0微调G1。第三阶段不受额外候选开关控制；主动矢量骨架与SVG/PPT形状重构已退出该路线。已有图的局部修改沿用当前图像／源文件。字体、加粗、配色、紧凑对齐与科学内容检查继续保留。
 
+### ACL 2027 与 ICML 2027 · 2026-11-25
+
+新增 [ACL 2027](ccf-paper-writer/references/venue-guides/acl.md) 和 [ICML 2027](ccf-paper-writer/references/venue-guides/icml.md) 适配。ACL 覆盖长稿、短稿、ARR 评审和 ACL commitment。ICML 按主会研究稿的贡献类型组织写作和预审，检查 Impact Statement 与 AI Disclosure。两个指南都链接官方 LaTeX 模板和本地投稿检查。
+
 ### CVPR 2027 与本轮修复 · 2026-11-12
 
 准备投稿时，模板、正文和检查清单应该说同一套规则。这轮接入了 [CVPR 2027 官方模板](ccf-latex-templates/CVPR/2027/main.tex)和[对应指南](ccf-paper-writer/references/venue-guides/cvpr.md)：按年份保留完整依赖，检查模式、纸张尺寸、匿名信息、正文页数及必需的 LLM Usage Statement。注册、作者资格等事项会单独列出，方便作者最后核对。
